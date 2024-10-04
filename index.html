@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Daftar Catatan</title>
+</head>
+
+<body>
+    <div class="header">
+        <h1>YOUR NOTES!</h1>
+        <input type="text" placeholder="search notes" id="search" oninput="filterNotes()">
+        <button onclick="changeTheme('pink')">Pink</button>
+        <button onclick="changeTheme('white')"> White</button>
+        <button onclick="changeTheme('black')">Black</button>
+    </div>
+
+    <div class="note-list" id="note-list">
+        <!-- Daftar catatan akan dimunculkan di sini -->
+    </div>
+
+    <button class="add-note" onclick="window.location.href='notes.html'" style="position: fixed; bottom: 20px; right: 20px;">add new</button>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Tulis Catatan</title>
+</head>
+
+<body>
+    <div class="header">
+        <h1>WRITE NOTES</h1>
+        <button onclick="window.location.href='index.html'">BACK</button>
+        <div id="date"></div>
+        <!-- Tanggal ditampilkan di sini -->
+        <div id="time"></div>
+        <!-- Waktu ditampilkan di sini -->
+        <div id="charCount" class="character-count">Character: 0</div>
+        <!-- Jumlah karakter ditampilkan di sini -->
+    </div>
+
+    <div class="note-section">
+        <div id="note-title" contenteditable="true" class="note-title" placeholder="Add tittle"></div>
+        <div id="note-content" contenteditable="true" class="note-content" placeholder="message..." oninput="updateCharacterCount()"></div>
+    </div>
+
+    <button class="save-note" onclick="saveNote()">SAVE</button>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
