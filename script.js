@@ -165,3 +165,90 @@ function printNoteToPDF(index) {
         printWindow.print();
     }
 }
+
+// Fungsi untuk mengimpor folder
+async function importFolder() {
+    try {
+        const folderHandle = await window.showDirectoryPicker(); // Meminta akses ke folder
+
+        for await (const entry of folderHandle.values()) {
+            if (entry.kind === 'file') {
+                const file = await entry.getFile();
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    console.log("File content:", e.target.result);
+                    // Di sini, kamu bisa menambahkan logika untuk menangani konten file
+                    alert(`File "${file.name}" berhasil diimpor!`);
+                };
+
+                reader.readAsText(file); // Membaca konten file
+            }
+        }
+    } catch (error) {
+        console.error("Gagal mengimpor folder:", error);
+    }
+}
+
+// Fungsi untuk menampilkan file dalam daftar catatan dan membuka file jika formatnya sesuai
+async function importFolder() {
+    try {
+        const folderHandle = await window.showDirectoryPicker(); // Meminta akses ke folder
+        const notes = JSON.parse(localStorage.getItem('notes')) || []; // Mengambil catatan yang ada
+
+        for await (const entry of folderHandle.values()) {
+            if (entry.kind === 'file') {
+                const file = await entry.getFile();
+                const fileExtension = file.name.split('.').pop().toLowerCase(); // Mendapatkan ekstensi file
+
+                // Cek apakah file berformat doc, pdf, atau txt
+                if (['doc', 'docx', 'pdf', 'txt'].includes(fileExtension)) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        const content = e.target.result;
+
+                        // Simpan file sebagai catatan baru di localStorage
+                        notes.push({
+                            title: file.name,
+                            content: content,
+                            date: new Date().toLocaleString(),
+                            type: fileExtension // Tambahkan tipe file untuk penanganan pembukaan nanti
+                        });
+                        localStorage.setItem('notes', JSON.stringify(notes)); // Simpan catatan
+                        displayNotes(); // Tampilkan ulang catatan
+                    };
+
+                    if (fileExtension === 'txt') {
+                        reader.readAsText(file); // Membaca file txt
+                    } else {
+                        reader.readAsArrayBuffer(file); // Membaca file non-txt sebagai array buffer
+                    }
+                } else {
+                    alert(`File "${file.name}" tidak berformat doc, docx, pdf, atau txt, tidak diimpor.`);
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Gagal mengimpor folder:", error);
+    }
+}
+
+// Modifikasi fungsi viewNote untuk membuka catatan yang diimpor dari folder
+function viewNote(index) {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    const note = notes[index];
+
+    if (note) {
+        if (note.type === 'txt') {
+            // Tampilkan isi file txt
+            alert(`Judul: ${note.title}\n\nIsi: ${note.content}`);
+        } else if (['pdf', 'doc', 'docx'].includes(note.type)) {
+            const blob = new Blob([note.content], { type: note.type === 'pdf' ? 'application/pdf' : 'application/msword' });
+            const fileUrl = URL.createObjectURL(blob);
+            window.open(fileUrl); // Membuka file pdf/doc di tab baru
+        } else {
+            alert(`File ${note.title} tidak dapat dibuka.`);
+        }
+    }
+}
