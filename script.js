@@ -12,6 +12,19 @@ function changeTheme(theme) {
     } else if (theme === 'black') {
         document.documentElement.style.setProperty('--bg-color', '#000000');
         document.documentElement.style.setProperty('--font-color', '#ffd700');
+        const encryptionKey = 'your-secret-key'; // Kunci enkripsi (jangan ubah untuk konsistensi)
+
+        // Fungsi untuk mengenkripsi catatan
+        function encryptNote(content) {
+            return CryptoJS.AES.encrypt(content, encryptionKey).toString();
+        }
+
+        // Fungsi untuk mendekripsi catatan
+        function decryptNote(encryptedContent) {
+            const bytes = CryptoJS.AES.decrypt(encryptedContent, encryptionKey);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        }
+
     }
     localStorage.setItem('theme', theme); // Simpan tema
 }
@@ -88,6 +101,23 @@ function viewNote(index) {
 }
 
 // Sinkronisasi tema pada halaman penulisan
+function saveNote() {
+    const title = document.getElementById('note-title').innerText;
+    const content = document.getElementById('note-content').innerText;
+    const date = new Date().toLocaleString(); // Catat tanggal dan waktu pembuatan
+
+    if (title && content) {
+        const notes = JSON.parse(localStorage.getItem('notes')) || [];
+        const encryptedContent = encryptNote(content); // Enkripsi konten catatan
+        notes.push({ title, content: encryptedContent, date }); // Simpan catatan ter-enkripsi
+        localStorage.setItem('notes', JSON.stringify(notes));
+        alert('SAVED!!');
+        window.location.href = 'index.html'; // Kembali ke daftar
+    } else {
+        alert('Judul dan catatan tidak boleh kosong!');
+    }
+}
+
 function syncThemeOnLoad() {
     const theme = localStorage.getItem('theme') || 'white';
     changeTheme(theme);
@@ -104,7 +134,17 @@ function setDateTime() {
 }
 
 window.onload = () => {
-    displayNotes(); // Panggil fungsi untuk menampilkan catatan
+    displayNotes(); // Panggil fungsi untuk menampilkan catatan 
+    function viewNote(index) {
+        const notes = JSON.parse(localStorage.getItem('notes')) || [];
+        const note = notes[index];
+
+        if (note) {
+            const decryptedContent = decryptNote(note.content); // Dekripsi konten
+            alert(`Judul: ${note.title}\n\nIsi: ${decryptedContent}`);
+        }
+    }
+
     setDateTime(); // Panggil fungsi untuk mengatur tanggal dan waktu
     syncThemeOnLoad(); // Panggil fungsi untuk sinkronisasi tema
 };
